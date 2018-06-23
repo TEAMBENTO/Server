@@ -1,14 +1,15 @@
 const { assert } = require('chai');
 const { Types } = require('mongoose');
+const { getErrors } = require('./helpers');
 const Event = require('../../lib/models/Event');
 
 describe('Event model', () => {
 
-    it('vaild good model', () => {
+    it('valid good model', () => {
         const data = {
             name: 'PDX Monthly Run',
             description: 'Come get your run on!',
-            type: ['running'],
+            type: 'running',
             location: 'Portland, OR',
             time: {
                 start: new Date(2018, 6, 22, 7, 30),
@@ -23,5 +24,15 @@ describe('Event model', () => {
         data._id = event._id;
         assert.deepEqual(event.toJSON(), data);
         assert.isUndefined(event.validateSync());
+    });
+
+    it('event', () => {
+        const event = new Event({});
+        const errors = getErrors(event.validateSync(), 4);
+        assert.equal(errors.name.kind, 'required');
+        assert.equal(errors.description.kind, 'required');
+        assert.equal(errors.type.kind, 'required');
+        assert.equal(errors.location.kind, 'required');
+        assert.equal(errors.time.start.kind, 'required');
     });
 });

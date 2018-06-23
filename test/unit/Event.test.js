@@ -28,11 +28,12 @@ describe('Event model', () => {
 
     it('event', () => {
         const event = new Event({});
-        const errors = getErrors(event.validateSync(), 4);
+        const errors = getErrors(event.validateSync(), 5);
+
         assert.equal(errors.name.kind, 'required');
         assert.equal(errors.description.kind, 'required');
         assert.equal(errors.type.kind, 'required');
         assert.equal(errors.location.kind, 'required');
-        assert.equal(errors.time.start.kind, 'required');
+        assert.equal(errors.host.kind, 'required');
     });
 });

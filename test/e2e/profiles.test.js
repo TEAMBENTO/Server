@@ -1,12 +1,12 @@
 const { assert } = require('chai');
 const request = require('./request');
 const { dropCollection } = require('./db');
-// const { verify } = require('../../lib/util/')
+const { verify } = require('../../lib/auth/token-service');
 
 describe('Profile E2E Test', () => {
 
-    before(() => dropCollection('profile'));
     before(() => dropCollection('users'));
+    before(() => dropCollection('profiles'));
 
     let user1 = {
         email: 'foo@bar.com',
@@ -15,44 +15,45 @@ describe('Profile E2E Test', () => {
     };
 
     let profile1 = {
+        userId: {},
         activities: 'basketball',
         bio: 'this is me',
         demographic: 'Im a boop',
         location: 'Portland',
         image: 'image link'
     };
-
+    
     before(() => {
         return request
-            .post('/auth/signup')
+            .post('/api/auth/signup')
             .send(user1)
             .then(({ body }) => {
-                user1._id = verify(body.token).id;
+                user1 = body;
                 user1.token = body.token;
             });
-    });
+    });    
 
-    before(() => {
-        profile1.push(user1._id);
-        return request.post('/api/profile')
+    it('saves or posts a profile', () => {
+        profile1.userId = user1._id;
+        console.log('this is user id', user1);
+        return request.post('/api/profiles')
             .set('Authorization', user1.token)
             .send(profile1)
             .then(({ body }) => {
+                console.log(body);
+                assert.ok(body._id);
                 profile1 = body;
             });
+    
     });
 
-    const checkOk = res => {
-        if(!res.ok) throw res.error;
-        return res;
-    };
+   
 
-    it('posts a profile to the db', () => {
+    it.skip('posts a profile to the db', () => {
         profile1.push(user1._id);
-        return request.post('/api/profile')
+        return request.post('/api/profiles')
             .set('Authorization', user1.token)
             .send(profile1)
-            .then(checkOk)
             .then(({ body }) => {
                 const { _id, __v } = body;
                 assert.ok(_id);
@@ -67,10 +68,10 @@ describe('Profile E2E Test', () => {
 
     });
 
-    it('gets profile by id', () => {
-        return request.get(`/api/profile/${profile1._id}`)
-            .then(({ body }) => {
-                assert.equal(body.)
-            });
-    });
+    // it('gets profile by id', () => {
+    //     return request.get(`/api/profile/${profile1._id}`)
+    //         .then(({ body }) => {
+    //             assert.equal(body.)
+    //         });
+    // });
 });

@@ -79,7 +79,7 @@ describe('Profile E2E Test', () => {
 
     it('gets profile by id', () => {
         return request.get(`/api/profiles/${profile1._id}`)
-            .set('Authoization', user1.token)    
+            .set('Authorization', user1.token)    
             .then(({ body }) => {
                 assert.equal(body.userId.name, user1.name);
             });

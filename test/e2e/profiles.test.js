@@ -91,7 +91,33 @@ describe('Profile E2E Test', () => {
             .set('Authorization', user1.token)
             .then(({ body }) => {
                 assert.deepEqual(body[1].userId.name, user1.name);
-                assert.equal(body[1].activities, 'yoga');
+                assert.equal(body.length, 2);
             }); 
+    });
+
+    it('update a profile', () => {
+        profile1.activities = 'yoga';
+        return request.put(`/api/profiles/${profile1._id}`)
+            .set('Authorization', user1.token)
+            .send(profile1)
+            .then(({ body }) => {
+                assert.deepEqual(body, profile1);
+                return request.get(`/api/profiles/${profile1._id}`);
+            })
+            .then(({ body }) => {
+                assert.equal(body.activities, profile1.activities);
+            });
+    });
+
+    it('deletes a profile by id', () => {
+        return request.delete(`/api/profiles/${profile2._id}`)
+            .set('Authorization', user1.token)
+            .then(() => {
+                return request.get(`/api/profiles/${profile2._id}`);
+            })
+            .then(res => {
+                assert.equal(res.status, 404);
+            });
+
     });
 });

@@ -1,6 +1,6 @@
 const { assert } = require('chai');
 const { Types } = require('mongoose');
-// const { getErrors } = require('./helpers');
+const { getErrors } = require('./helpers');
 const Profile = require('../../lib/models/Profile');
 
 describe('Profile Model', () => {
@@ -18,5 +18,12 @@ describe('Profile Model', () => {
         data._id = profile._id;
         assert.deepEqual(profile.toJSON(), data);
         assert.isUndefined(profile.validateSync());
+    });
+
+    it('profile required fields', () => {
+        const profile = new Profile({ });
+        const errors = getErrors(profile.validateSync(), 1);
+        assert.equal(errors.userId.kind, 'required');
+
     });
 });

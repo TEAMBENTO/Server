@@ -22,6 +22,15 @@ describe('Profile E2E Test', () => {
         location: 'Portland',
         image: 'image link'
     };
+
+    let profile2 = {
+        userId: {},
+        activities: 'yoga',
+        bio: 'this is me',
+        demographic: 'Im a boop2',
+        location: 'Portland',
+        image: 'image link'
+    };
     
     before(() => {
         return request
@@ -35,43 +44,54 @@ describe('Profile E2E Test', () => {
 
     it('saves or posts a profile', () => {
         profile1.userId = user1._id;
-        console.log('this is user id', user1);
-        return request.post('/api/profiles')
-            .set('Authorization', user1.token)
-            .send(profile1)
-            .then(({ body }) => {
-                console.log(body);
-                assert.ok(body._id);
-                profile1 = body;
-            });
-    
-    });
-
-   
-
-    it.skip('posts a profile to the db', () => {
-        profile1.push(user1._id);
         return request.post('/api/profiles')
             .set('Authorization', user1.token)
             .send(profile1)
             .then(({ body }) => {
                 const { _id, __v } = body;
                 assert.ok(_id);
-                assert.equal(__v, 0);
                 assert.deepEqual(body, {
                     ...profile1,
                     _id, __v
                 });
                 profile1 = body;
             });
-
-
+    
     });
 
-    // it('gets profile by id', () => {
-    //     return request.get(`/api/profile/${profile1._id}`)
-    //         .then(({ body }) => {
-    //             assert.equal(body.)
-    //         });
-    // });
+    it('saves or posts a profile', () => {
+        profile2.userId = user1._id;
+        return request.post('/api/profiles')
+            .set('Authorization', user1.token)
+            .send(profile2)
+            .then(({ body }) => {
+                const { _id, __v } = body;
+                assert.ok(_id);
+                assert.deepEqual(body, {
+                    ...profile2,
+                    _id, __v
+                });
+                profile2 = body;
+            });
+    
+    });
+
+
+    it('gets profile by id', () => {
+        return request.get(`/api/profiles/${profile1._id}`)
+            .set('Authoization', user1.token)    
+            .then(({ body }) => {
+                assert.equal(body.userId.name, user1.name);
+            });
+    });
+
+    it('gets all profiles', () => {
+
+        return request.get('/api/profiles/')
+            .set('Authorization', user1.token)
+            .then(({ body }) => {
+                assert.deepEqual(body[1].userId.name, user1.name);
+                assert.equal(body[1].activities, 'yoga');
+            }); 
+    });
 });

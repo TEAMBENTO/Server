@@ -17,6 +17,14 @@ describe('Event E2E API', () => {
         attendance: [Types.ObjectId()]
     };
 
+    it('posts an event', () => {
+        return request.post('/api/events')
+            .send(race)
+            .then(({ body }) => {
+                const { _id } = body;
+                assert.ok(_id);
+            });
+    });
 
 
 

@@ -20,7 +20,7 @@ describe('Event model', () => {
             attendance: [Types.ObjectId()]
         };
 
-        const event = Event(data);
+        const event = new Event(data);
         data._id = event._id;
         assert.deepEqual(event.toJSON(), data);
         assert.isUndefined(event.validateSync());

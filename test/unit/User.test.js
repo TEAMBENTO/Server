@@ -25,4 +25,9 @@ describe('User model', () => {
         assert.deepEqual(data, user.toJSON());
     });
 
+    it('Generates Hash from Password', () => {
+        assert.ok(user.hash);
+        assert.notEqual(user.hash, password);
+    });
+
 });

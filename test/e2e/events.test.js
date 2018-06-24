@@ -7,15 +7,18 @@ describe('Event E2E API', () => {
 
     before(() => dropCollection('events'));
 
+    const startTime = new Date('June 30, 2018 09:00:00');
+    const endTime = new Date('June 30, 2018 12:00:00');
+
     let race = {
         name: 'PDX Trail Run',
         description: 'A trail run in forest park.',
         type: 'running',
         location: 'Forest Park',
-        // time: {
-        //     start: new Date('June 30, 2018 09:00:00'),
-        //     end: new Date('June 30, 2018 12:00:00')
-        // },
+        time: {
+            start: startTime.toJSON(),
+            end: endTime.toJSON()
+        },
         // host: [Types.ObjectId()],
         // group: [Types.ObjectId()],
         // attendance: [Types.ObjectId()]

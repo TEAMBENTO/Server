@@ -36,8 +36,15 @@ describe('Event E2E API', () => {
             });
     });
 
-    it('gets all albums', () => {
+    it('gets all events', () => {
         return request.get('/api/events')
+            .then(({ body }) => {
+                assert.deepEqual(body, [race]);
+            });
+    });
+
+    it('gets event by id', () => {
+        return request.get('/api/events/${race._id}')
             .then(({ body }) => {
                 assert.deepEqual(body, [race]);
             });

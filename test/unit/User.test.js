@@ -34,4 +34,12 @@ describe('User model', () => {
         assert.isOk(user.comparePassword(password));
     });
 
+    it('Required Fields', () => {
+        const user2 = new User({});
+        const errors = getErrors(user2.validateSync(), 3);
+        assert.equal(errors.name.kind, 'required');
+        assert.equal(errors.email.kind, 'required');
+        assert.equal(errors.hash.kind, 'required');
+    });
+
 });

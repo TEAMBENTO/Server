@@ -14,7 +14,7 @@ describe('Group model', () => {
             description: 'A lovely bunch bunch of Mongooses who want to have fun',
             private: true
         };
-        const group = Group(data);
+        const group = new Group(data);
         data._id = group._id;
         assert.deepEqual(group.toJSON(), data);
         assert.isUndefined(group.validateSync());

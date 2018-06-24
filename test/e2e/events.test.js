@@ -44,12 +44,20 @@ describe('Event E2E API', () => {
     });
 
     it('gets event by id', () => {
-        return request.get('/api/events/${race._id}')
+        return request.get(`/api/events/${race._id}`)
             .then(({ body }) => {
                 assert.deepEqual(body, race);
             });
     });
 
+    it('updates an event by id', () => {
+        race.name = 'Forest Park Trail Run';
 
+        return request.pup(`/api/events/${race._id}`)
+            .send(race)
+            .then(({ body }) => {
+                assert.equal(body.name, race.name);
+            });
+    });
 
 });

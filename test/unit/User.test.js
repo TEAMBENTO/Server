@@ -1,5 +1,4 @@
 const { assert } = require('chai');
-const { Types } = require('mongoose');
 const User = require('../../lib/models/User');
 const { getErrors } = require('./helpers');
 

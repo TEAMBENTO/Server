@@ -62,7 +62,13 @@ describe('Event E2E API', () => {
     });
 
     it('deletes an event by id', () => {
-        
+        return request.delete(`/api/events/${race._id}`)
+            .then(() => {
+                return request.get(`/api/events/${race._id}`);
+            })
+            .then(res => {
+                assert.strictEqual(res.status, 404);
+            });
     });
 
 });

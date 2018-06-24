@@ -7,6 +7,7 @@ describe('Profile E2E Test', () => {
 
     before(() => dropCollection('users'));
     before(() => dropCollection('profiles'));
+    before(() => dropCollection('groups'));
 
     let user1 = {
         email: 'foo@bar.com',
@@ -31,6 +32,15 @@ describe('Profile E2E Test', () => {
         location: 'Portland',
         image: 'image link'
     };
+
+    let group1 = {
+        captains: [],
+        members: [],
+        teamName: 'Sneaky Sneks',
+        type: 'soccer',
+        description: 'We are the sneaky sneks',
+        private: false
+    };
     
     before(() => {
         return request
@@ -40,7 +50,16 @@ describe('Profile E2E Test', () => {
                 user1 = body;
                 user1.token = body.token;
             });
-    });    
+    }); 
+    
+    before(() => {
+        return request.post('/api/groups')
+            .set('Authorization', user1.token)
+            .send(group1)
+            .then(({ body }) => {
+                group1 = body;
+            });
+    });
 
     it('saves or posts a profile', () => {
         profile1.userId = user1._id;
@@ -58,6 +77,8 @@ describe('Profile E2E Test', () => {
             });
     
     });
+
+
 
     it('saves or posts a profile', () => {
         profile2.userId = user1._id;
@@ -78,11 +99,18 @@ describe('Profile E2E Test', () => {
 
 
     it('gets profile by id', () => {
-        return request.get(`/api/profiles/${profile1._id}`)
-            .set('Authorization', user1.token)    
+        group1.captains.push(profile1._id);
+        group1.members.push(profile1._id);
+        return request.put(`/api/groups/${group1._id}`)
+            .send(group1)
             .then(({ body }) => {
-                assert.equal(body.userId.name, user1.name);
-            });
+                group1 = body;
+                return request.get(`/api/profiles/${profile1._id}`);
+            })
+            .then(({ body }) => {
+                console.log('BODY', body);
+                assert.equal(body.groups.length, 1);
+            }); 
     });
 
     it('gets all profiles', () => {

@@ -46,7 +46,7 @@ describe('Event E2E API', () => {
     it('gets event by id', () => {
         return request.get('/api/events/${race._id}')
             .then(({ body }) => {
-                assert.deepEqual(body, [race]);
+                assert.deepEqual(body, race);
             });
     });
 

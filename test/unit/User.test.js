@@ -30,4 +30,8 @@ describe('User model', () => {
         assert.notEqual(user.hash, password);
     });
 
+    it('Compares Password to Hash', () => {
+        assert.isOk(user.comparePassword(password));
+    });
+
 });

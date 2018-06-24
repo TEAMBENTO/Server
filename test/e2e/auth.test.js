@@ -13,12 +13,6 @@ describe('User E2E', () => {
         password: '1'
     };
 
-    let user2 = {
-        name: 'name2',
-        email: 'name2@name2.com',
-        password: '2'
-    };
-
     let token = null;
 
     beforeEach(() => {
@@ -71,7 +65,7 @@ describe('User E2E', () => {
         return request
             .post('/api/auth/signin')
             .send({
-                email: 'rober@ebert.com',
+                email: 'name1@name1.com',
                 password: 'bad'
             })
             .then(res => {

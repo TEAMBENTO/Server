@@ -11,14 +11,14 @@ describe('Event E2E API', () => {
         name: 'PDX Trail Run',
         description: 'A trail run in forest park.',
         type: 'running',
-        time: {
-            start: new Date('June 30, 2018 09:00:00'),
-            end: new Date('June 30, 2018 12:00:00')
-        },
         location: 'Forest Park',
-        host: [Types.ObjectId()],
-        group: [Types.ObjectId()],
-        attendance: [Types.ObjectId()]
+        // time: {
+        //     start: new Date('June 30, 2018 09:00:00'),
+        //     end: new Date('June 30, 2018 12:00:00')
+        // },
+        // host: [Types.ObjectId()],
+        // group: [Types.ObjectId()],
+        // attendance: [Types.ObjectId()]
     };
 
     it('posts an event', () => {
@@ -33,6 +33,7 @@ describe('Event E2E API', () => {
                     _id,
                     __v
                 });
+                race = body;
             });
     });
 
@@ -53,11 +54,15 @@ describe('Event E2E API', () => {
     it('updates an event by id', () => {
         race.name = 'Forest Park Trail Run';
 
-        return request.pup(`/api/events/${race._id}`)
+        return request.put(`/api/events/${race._id}`)
             .send(race)
             .then(({ body }) => {
                 assert.equal(body.name, race.name);
             });
+    });
+
+    it('deletes an event by id', () => {
+        
     });
 
 });

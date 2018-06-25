@@ -1,9 +1,8 @@
 const { assert } = require('chai');
 const request = require('./request');
 const { dropCollection } = require('./db');
-const { verify } = require('../../lib/auth/token-service');
 
-describe.only('Profile E2E Test', () => {
+describe('Profile E2E Test', () => {
 
     before(() => dropCollection('users'));
     before(() => dropCollection('profiles'));
@@ -136,26 +135,22 @@ describe.only('Profile E2E Test', () => {
                 return request.get(`/api/profiles/${profile1._id}`);
             })
             .then(({ body }) => {
-                console.log('BODY', body);
                 assert.equal(body.groups.length, 1);
             }); 
     });
 
-    // it('gets profile2 by id', () => {
-    //     group1.captains.push(profile2._id);
-    //     // group1.members.push(profile1._id);
-    //     console.log('GROUP1', group1);
-    //     return request.put(`/api/groups/${group1._id}`)
-    //         .send(group1)
-    //         .then(({ body }) => {
-    //             group1 = body;
-    //             return request.get(`/api/profiles/${profile2._id}`);
-    //         })
-    //         .then(({ body }) => {
-    //             console.log('BODY', body);
-    //             assert.equal(body.groups.length, 1);
-    //         }); 
-    // });
+    it('gets profile2 by id', () => {
+        group1.captains.push(profile2._id);
+        return request.put(`/api/groups/${group1._id}`)
+            .send(group1)
+            .then(({ body }) => {
+                group1 = body;
+                return request.get(`/api/profiles/${profile2._id}`);
+            })
+            .then(({ body }) => {
+                assert.equal(body.groups.length, 1);
+            }); 
+    });
 
     it('gets all profiles', () => {
 

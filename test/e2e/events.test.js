@@ -1,6 +1,5 @@
 const { assert } = require('chai');
 const request = require('./request');
-const { Types } = require('mongoose');
 const { dropCollection } = require('./db');
 
 describe.only('Event E2E API', () => {
@@ -102,7 +101,14 @@ describe.only('Event E2E API', () => {
     it('gets all events', () => {
         return request.get('/api/events')
             .then(({ body }) => {
-                assert.deepEqual(body, [race]);
+                assert.deepEqual(body, [{ ...race, host: [{
+                    _id: dwayne._id,
+                    image: 'image link',
+                    userId: {
+                        _id: theRock._id,
+                        name: 'Dwayne Johnson'
+                    }
+                }] }]);
             });
     });
     
@@ -120,7 +126,14 @@ describe.only('Event E2E API', () => {
     it('gets event by id', () => {
         return request.get(`/api/events/${race._id}`)
             .then(({ body }) => {
-                assert.deepEqual(body, race);
+                assert.deepEqual(body, { ...race, host: [{
+                    _id: dwayne._id,
+                    image: 'image link',
+                    userId: {
+                        _id: theRock._id,
+                        name: 'Dwayne Johnson'
+                    }
+                }] });
             });
     });
 

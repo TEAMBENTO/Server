@@ -105,20 +105,20 @@ describe.only('Event E2E API', () => {
                 assert.deepEqual(body, [race]);
             });
     });
-
-    it('gets event by id', () => {
-        return request.get(`/api/events/${race._id}`)
+    
+    it('updates an event by id', () => {
+        race.group = [squad._id];
+        race.attendance = [dwayne._id];
+        
+        return request.put(`/api/events/${race._id}`)
+            .send(race)
             .then(({ body }) => {
                 assert.deepEqual(body, race);
             });
     });
-
-    it('updates an event by id', () => {
-        race.group = [squad._id];
-        race.attendance = [dwayne._id];
-
-        return request.put(`/api/events/${race._id}`)
-            .send(race)
+    
+    it('gets event by id', () => {
+        return request.get(`/api/events/${race._id}`)
             .then(({ body }) => {
                 assert.deepEqual(body, race);
             });

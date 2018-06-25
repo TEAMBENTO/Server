@@ -39,7 +39,8 @@ describe('Profile E2E Test', () => {
         teamName: 'Sneaky Sneks',
         type: 'soccer',
         description: 'We are the sneaky sneks',
-        private: false
+        private: false,
+        image: 'Image'
     };
 
     const startTime = new Date('June 30, 2018 09:00:00');

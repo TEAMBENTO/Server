@@ -38,7 +38,8 @@ describe('groups e2e', () => {
         teamName: 'Sneaky Sneks',
         type: 'soccer',
         description: 'We are the sneaky sneks',
-        private: false
+        private: false,
+        image: 'Image'
     };
 
     let group2 = {
@@ -47,7 +48,8 @@ describe('groups e2e', () => {
         teamName: 'Not sneaky',
         type: 'soccer',
         description: 'We are the sneaky sneks',
-        private: false
+        private: false,
+        image: 'Image'
     };
 
     before(() => {

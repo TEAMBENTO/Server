@@ -46,9 +46,9 @@ describe.only('Event E2E API', () => {
     let squad = {
         captains: [],
         members: [],
-        teamName: 'Sneaky Sneks',
-        type: 'soccer',
-        description: 'We are the sneaky sneks',
+        teamName: 'The Rock Squad',
+        type: 'basketball',
+        description: 'Play the sports!',
         private: false
     };
 
@@ -68,6 +68,17 @@ describe.only('Event E2E API', () => {
             .send(dwayne)
             .then(({ body }) => {
                 dwayne = body;
+            });
+    });
+
+    before(() => {
+        squad.captains = [dwayne._id];
+        squad.members = [dwayne._id];
+
+        return request.post('/api/groups')
+            .send(squad)
+            .then(({ body }) => {
+                squad = body;
             });
     });
 
@@ -103,23 +114,24 @@ describe.only('Event E2E API', () => {
     });
 
     it('updates an event by id', () => {
-        race.name = 'Forest Park Trail Run';
+        race.group = [squad._id];
+        race.attendance = [dwayne._id];
 
         return request.put(`/api/events/${race._id}`)
             .send(race)
             .then(({ body }) => {
-                assert.equal(body.name, race.name);
+                assert.deepEqual(body, race);
             });
     });
 
-    // it('deletes an event by id', () => {
-    //     return request.delete(`/api/events/${race._id}`)
-    //         .then(() => {
-    //             return request.get(`/api/events/${race._id}`);
-    //         })
-    //         .then(res => {
-    //             assert.strictEqual(res.status, 404);
-    //         });
-    // });
+    it('deletes an event by id', () => {
+        return request.delete(`/api/events/${race._id}`)
+            .then(() => {
+                return request.get(`/api/events/${race._id}`);
+            })
+            .then(res => {
+                assert.strictEqual(res.status, 404);
+            });
+    });
 
 });

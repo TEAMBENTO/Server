@@ -3,11 +3,12 @@ const request = require('./request');
 const { dropCollection } = require('./db');
 const { verify } = require('../../lib/auth/token-service');
 
-describe('Profile E2E Test', () => {
+describe.only('Profile E2E Test', () => {
 
     before(() => dropCollection('users'));
     before(() => dropCollection('profiles'));
     before(() => dropCollection('groups'));
+    before(() => dropCollection('events'));
 
     let user1 = {
         email: 'foo@bar.com',
@@ -40,6 +41,23 @@ describe('Profile E2E Test', () => {
         type: 'soccer',
         description: 'We are the sneaky sneks',
         private: false
+    };
+
+    const startTime = new Date('June 30, 2018 09:00:00');
+    const endTime = new Date('June 30, 2018 12:00:00');
+
+    let race = {
+        name: 'PDX Trail Run',
+        description: 'A trail run in forest park.',
+        type: 'running',
+        location: 'Forest Park',
+        time: {
+            start: startTime.toJSON(),
+            end: endTime.toJSON()
+        },
+        host: [],
+        group: [],
+        attendance: []
     };
     
     before(() => {
@@ -97,8 +115,18 @@ describe('Profile E2E Test', () => {
     
     });
 
+    it('posts an event', () => {
+        race.host.push(profile1._id);
+        return request.post('/api/events')
+            .set('Authorization', user1.token)
+            .send(race)
+            .then(({ body }) => {
+                race = body;
+            });
+    });
 
-    it('gets profile by id', () => {
+
+    it('gets profile1 by id', () => {
         group1.captains.push(profile1._id);
         group1.members.push(profile1._id);
         return request.put(`/api/groups/${group1._id}`)
@@ -112,6 +140,22 @@ describe('Profile E2E Test', () => {
                 assert.equal(body.groups.length, 1);
             }); 
     });
+
+    // it('gets profile2 by id', () => {
+    //     group1.captains.push(profile2._id);
+    //     // group1.members.push(profile1._id);
+    //     console.log('GROUP1', group1);
+    //     return request.put(`/api/groups/${group1._id}`)
+    //         .send(group1)
+    //         .then(({ body }) => {
+    //             group1 = body;
+    //             return request.get(`/api/profiles/${profile2._id}`);
+    //         })
+    //         .then(({ body }) => {
+    //             console.log('BODY', body);
+    //             assert.equal(body.groups.length, 1);
+    //         }); 
+    // });
 
     it('gets all profiles', () => {
 

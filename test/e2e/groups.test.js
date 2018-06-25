@@ -85,6 +85,7 @@ describe('groups e2e', () => {
         group1.members.push(profile1._id);
 
         return request.post('/api/groups')
+            .set('Authorization', user1.token)
             .send(group1)
             .then(({ body }) => {
                 const { _id, __v } = body;
@@ -100,6 +101,7 @@ describe('groups e2e', () => {
         group2.members.push(profile1._id);
 
         return request.post('/api/groups')
+            .set('Authorization', user1.token)
             .send(group2)
             .then(({ body }) => {
                 const { _id, __v } = body;
@@ -113,6 +115,7 @@ describe('groups e2e', () => {
     
     it('gets all', () => {
         return request.get('/api/groups')
+            .set('Authorization', user1.token)
             .then(({ body }) => {
                 assert.deepEqual(body[0].captains[0].userId.name, 'Mr. Foo Bar');
                 assert.deepEqual(body[0].members[0].userId.name, 'Mr. Foo Bar');
@@ -121,6 +124,7 @@ describe('groups e2e', () => {
     
     it('gets group by id', () => {
         return request.get(`/api/groups/${group1._id}`)
+            .set('Authorization', user1.token)
             .then(({ body }) => {
                 assert.deepEqual(body.captains[0].userId.name, 'Mr. Foo Bar');
             });
@@ -129,10 +133,12 @@ describe('groups e2e', () => {
     it('updates a group by id', () => {
         group1.members.push(profile2._id);
         return request.put(`/api/groups/${group1._id}`)
+            .set('Authorization', user1.token)
             .send(group1)
             .then(({ body }) => {
                 assert.deepEqual(body, group1);
-                return request.get(`/api/groups/${group1._id}`);
+                return request.get(`/api/groups/${group1._id}`)
+                    .set('Authorization', user1.token);
             })
             .then(({ body }) => {
                 assert.equal(body.members.length, 2);
@@ -141,8 +147,10 @@ describe('groups e2e', () => {
 
     it('deletes a group by id', () => {
         return request.delete(`/api/groups/${group1._id}`)
+            .set('Authorization', user1.token)
             .then(() => {
-                return request.get(`/api/groups/${group1._id}`);
+                return request.get(`/api/groups/${group1._id}`)
+                    .set('Authorization', user1.token);
             })
             .then(res => {
                 assert.equal(res.status, 404);

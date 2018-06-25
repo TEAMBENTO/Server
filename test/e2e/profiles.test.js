@@ -129,10 +129,12 @@ describe('Profile E2E Test', () => {
         group1.captains.push(profile1._id);
         group1.members.push(profile1._id);
         return request.put(`/api/groups/${group1._id}`)
+            .set('Authorization', user1.token)
             .send(group1)
             .then(({ body }) => {
                 group1 = body;
-                return request.get(`/api/profiles/${profile1._id}`);
+                return request.get(`/api/profiles/${profile1._id}`)
+                    .set('Authorization', user1.token);
             })
             .then(({ body }) => {
                 assert.equal(body.groups.length, 1);
@@ -142,10 +144,12 @@ describe('Profile E2E Test', () => {
     it('gets profile2 by id', () => {
         group1.captains.push(profile2._id);
         return request.put(`/api/groups/${group1._id}`)
+            .set('Authorization', user1.token)
             .send(group1)
             .then(({ body }) => {
                 group1 = body;
-                return request.get(`/api/profiles/${profile2._id}`);
+                return request.get(`/api/profiles/${profile2._id}`)
+                    .set('Authorization', user1.token);
             })
             .then(({ body }) => {
                 assert.equal(body.groups.length, 1);
@@ -169,7 +173,8 @@ describe('Profile E2E Test', () => {
             .send(profile1)
             .then(({ body }) => {
                 assert.deepEqual(body, profile1);
-                return request.get(`/api/profiles/${profile1._id}`);
+                return request.get(`/api/profiles/${profile1._id}`)
+                    .set('Authorization', user1.token);
             })
             .then(({ body }) => {
                 assert.equal(body.activities, profile1.activities);
@@ -180,7 +185,8 @@ describe('Profile E2E Test', () => {
         return request.delete(`/api/profiles/${profile2._id}`)
             .set('Authorization', user1.token)
             .then(() => {
-                return request.get(`/api/profiles/${profile2._id}`);
+                return request.get(`/api/profiles/${profile2._id}`)
+                    .set('Authorization', user1.token);
             })
             .then(res => {
                 assert.equal(res.status, 404);

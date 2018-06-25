@@ -64,6 +64,7 @@ describe('Event E2E API', () => {
 
     before(() => {
         return request.post('/api/profiles')
+            .set('Authorization', theRock.token)
             .send(dwayne)
             .then(({ body }) => {
                 dwayne = body;
@@ -75,6 +76,7 @@ describe('Event E2E API', () => {
         squad.members = [dwayne._id];
 
         return request.post('/api/groups')
+            .set('Authorization', theRock.token)
             .send(squad)
             .then(({ body }) => {
                 squad = body;
@@ -84,6 +86,7 @@ describe('Event E2E API', () => {
     it('posts an event', () => {
         race.host = [dwayne._id];
         return request.post('/api/events')
+            .set('Authorization', theRock.token)
             .send(race)
             .then(({ body }) => {
                 const { _id, __v } = body;
@@ -117,6 +120,7 @@ describe('Event E2E API', () => {
         race.attendance = [dwayne._id];
         
         return request.put(`/api/events/${race._id}`)
+            .set('Authorization', theRock.token)
             .send(race)
             .then(({ body }) => {
                 assert.deepEqual(body, race);
@@ -139,6 +143,7 @@ describe('Event E2E API', () => {
 
     it('deletes an event by id', () => {
         return request.delete(`/api/events/${race._id}`)
+            .set('Authorization', theRock.token)
             .then(() => {
                 return request.get(`/api/events/${race._id}`);
             })

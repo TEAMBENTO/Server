@@ -2,7 +2,7 @@ const { assert } = require('chai');
 const request = require('./request');
 const { dropCollection } = require('./db');
 
-describe('groups e2e', () => {
+describe.only('groups e2e', () => {
 
     before(() => dropCollection('users'));
     before(() => dropCollection('profiles'));
@@ -114,14 +114,15 @@ describe('groups e2e', () => {
     it('gets all', () => {
         return request.get('/api/groups')
             .then(({ body }) => {
-                assert.deepEqual(body, [group1, group2]);
+                assert.deepEqual(body[0].captains[0].userId.name, 'Mr. Foo Bar');
+                assert.deepEqual(body[0].members[0].userId.name, 'Mr. Foo Bar');
             });
     });
     
     it('gets group by id', () => {
         return request.get(`/api/groups/${group1._id}`)
             .then(({ body }) => {
-                assert.deepEqual(body, group1);
+                assert.deepEqual(body.captains[0].userId.name, 'Mr. Foo Bar');
             });
     });
 
@@ -141,7 +142,7 @@ describe('groups e2e', () => {
     it('deletes a group by id', () => {
         return request.delete(`/api/groups/${group1._id}`)
             .then(() => {
-                return request.get(`/api/groups/${group1._id}`)
+                return request.get(`/api/groups/${group1._id}`);
             })
             .then(res => {
                 assert.equal(res.status, 404);

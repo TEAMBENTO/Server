@@ -48,7 +48,8 @@ describe('Event E2E API', () => {
         teamName: 'The Rock Squad',
         type: 'basketball',
         description: 'Play the sports!',
-        private: false
+        private: false,
+        image: 'Image'
     };
 
     before(() => {

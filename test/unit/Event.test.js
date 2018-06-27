@@ -41,6 +41,5 @@ describe('Event model', () => {
         assert.equal(errors.type.kind, 'required');
         assert.equal(errors['location.name'].kind, 'required');
         assert.equal(errors['time.start'].kind, 'required');
-        // assert.equal(errors.host.kind, 'required');
     });
 });

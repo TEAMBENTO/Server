@@ -10,7 +10,13 @@ describe('Event model', () => {
             name: 'PDX Monthly Run',
             description: 'Come get your run on!',
             type: 'running',
-            location: 'Portland, OR',
+            location: {
+                name: 'Spot',
+                coords: {
+                    lat: 45.25,
+                    lng: -123.75
+                }
+            },
             time: {
                 start: new Date(2018, 6, 22, 7, 30),
                 end: new Date(2018, 6, 22, 8, 30)
@@ -33,7 +39,7 @@ describe('Event model', () => {
         assert.equal(errors.name.kind, 'required');
         assert.equal(errors.description.kind, 'required');
         assert.equal(errors.type.kind, 'required');
-        assert.equal(errors.location.kind, 'required');
+        assert.equal(errors['location.name'].kind, 'required');
         assert.equal(errors['time.start'].kind, 'required');
         // assert.equal(errors.host.kind, 'required');
     });

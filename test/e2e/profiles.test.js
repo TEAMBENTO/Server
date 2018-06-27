@@ -50,7 +50,13 @@ describe('Profile E2E Test', () => {
         name: 'PDX Trail Run',
         description: 'A trail run in forest park.',
         type: 'running',
-        location: 'Forest Park',
+        location: {
+            name: 'Forest Park',
+            coords: {
+                lat: 45.25,
+                lng: -125.75
+            }
+        },
         time: {
             start: startTime.toJSON(),
             end: endTime.toJSON()

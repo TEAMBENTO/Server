@@ -91,15 +91,6 @@ describe('Profile E2E Test', () => {
                 user2.token = body.token;
             });
     });
-    
-    before(() => {
-        return request.post('/api/groups')
-            .set('Authorization', user1.token)
-            .send(group1)
-            .then(({ body }) => {
-                group1 = body;
-            });
-    });
 
     it('saves or posts a profile', () => {
         profile1.userId = user1._id;
@@ -114,6 +105,14 @@ describe('Profile E2E Test', () => {
                     _id, __v
                 });
                 profile1 = body;
+
+                group1.captains.push(profile1._id);
+                return request.post('/api/groups')
+                    .set('Authorization', user1.token)
+                    .send(group1)
+                    .then(({ body }) => {
+                        group1 = body;
+                    });
             });
     
     });
@@ -149,7 +148,6 @@ describe('Profile E2E Test', () => {
 
 
     it('gets profile1 by id', () => {
-        group1.captains.push(profile1._id);
         group1.members.push(profile1._id);
         return request.put(`/api/groups/${group1._id}`)
             .set('Authorization', user1.token)

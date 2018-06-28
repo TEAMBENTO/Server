@@ -2,7 +2,7 @@ const { assert } = require('chai');
 const request = require('./request');
 const { dropCollection } = require('./db');
 
-describe.only('Profile E2E Test', () => {
+describe('Profile E2E Test', () => {
 
     before(() => dropCollection('users'));
     before(() => dropCollection('profiles'));

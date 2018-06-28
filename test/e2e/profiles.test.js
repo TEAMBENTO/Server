@@ -2,7 +2,7 @@ const { assert } = require('chai');
 const request = require('./request');
 const { dropCollection } = require('./db');
 
-describe('Profile E2E Test', () => {
+describe.only('Profile E2E Test', () => {
 
     before(() => dropCollection('users'));
     before(() => dropCollection('profiles'));
@@ -202,6 +202,22 @@ describe('Profile E2E Test', () => {
             .then(({ body }) => {
                 assert.equal(body.activities, profile1.activities);
             });
+    });
+
+    it('tries to update a profile', () => {
+        profile1.activities = 'baseball';
+        return request.put(`/api/profiles/${profile1._id}`)
+            .set('Authorization', user2.token)
+            .send(profile1)
+            .then(({ body }) => {
+                assert.equal(body.error, 'not the same user');
+                return request.get(`/api/profiles/${profile1._id}`)
+                    .set('Authorization', user1.token);
+            })
+            .then(({ body }) => {
+                assert.equal(body.activities, 'yoga');
+            });
+        
     });
 
     it('deletes a profile by id', () => {

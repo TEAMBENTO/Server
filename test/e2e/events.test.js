@@ -8,8 +8,6 @@ describe('Event E2E API', () => {
     before(() => dropCollection('users'));
     before(() => dropCollection('profiles'));
 
-    let token = '';
-
     const startTime = new Date('June 30, 2018 09:00:00');
     const endTime = new Date('June 30, 2018 12:00:00');
 
@@ -39,6 +37,12 @@ describe('Event E2E API', () => {
         name: 'Dwayne Johnson'
     };
 
+    let notTheRock = {
+        email: 'not@therock.com',
+        password: 'nottherock',
+        name: 'NOT Dwayne Johnson'
+    };
+
     let dwayne = {
         userId: {},
         activities: 'basketball',
@@ -63,8 +67,18 @@ describe('Event E2E API', () => {
             .send(theRock)
             .then(({ body }) => {
                 theRock = body;
-                token = body.token;
+                theRock.token = body.token;
                 dwayne.userId = body._id;
+            });
+
+    });
+
+    before(() => {
+        return request.post('/api/auth/signup')
+            .send(notTheRock)
+            .then(({ body }) => {
+                notTheRock = body;
+                notTheRock.token = body.token;
             });
 
     });
@@ -121,6 +135,26 @@ describe('Event E2E API', () => {
                 }] }]);
             });
     });
+
+    it('cannot update an event if not the host', () => {
+        race.group = [squad._id];
+        race.attendance = [dwayne._id];
+        
+        return request.put(`/api/events/${race._id}`)
+            .set('Authorization', notTheRock.token)
+            .send(race)
+            .then(res => {
+                assert.equal(res.status, 403);
+                assert.equal(res.body.error, 'user is not the host');
+
+                return request.get(`/api/events/${race._id}`)
+                    .set('Authorization', notTheRock.token);
+            })
+            .then(({ body }) => {
+                assert.deepEqual(body.group, []);
+                assert.deepEqual(body.attendance, []);
+            });
+    });
     
     it('updates an event by id', () => {
         race.group = [squad._id];
@@ -145,6 +179,21 @@ describe('Event E2E API', () => {
                         name: 'Dwayne Johnson'
                     }
                 }] });
+            });
+    });
+
+    it('cannot deletes an event if not the host', () => {
+        return request.delete(`/api/events/${race._id}`)
+            .set('Authorization', notTheRock.token)
+            .then(res => {
+                assert.equal(res.status, 403);
+                assert.equal(res.body.error, 'user is not the host');
+
+                return request.get(`/api/events/${race._id}`)
+                    .set('Authorization', notTheRock.token);
+            })
+            .then(res => {
+                assert.equal(res.status, 200);
             });
     });
 

@@ -221,6 +221,21 @@ describe('Event E2E API', () => {
                         _id: theRock._id,
                         name: 'Dwayne Johnson'
                     }
+                }], attendance: [{
+                    _id: dwayne._id,
+                    image: 'image link',
+                    userId: {
+                        _id: theRock._id,
+                        name: 'Dwayne Johnson'
+                    }
+                },
+                {
+                    _id: dwayne2._id,
+                    image: 'image link',
+                    userId: {
+                        _id: theRock2._id,
+                        name: 'Dwayne Johnson2'
+                    }
                 }] });
             });
     });

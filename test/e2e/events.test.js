@@ -8,8 +8,6 @@ describe.only('Event E2E API', () => {
     before(() => dropCollection('users'));
     before(() => dropCollection('profiles'));
 
-    let token = '';
-
     const startTime = new Date('June 30, 2018 09:00:00');
     const endTime = new Date('June 30, 2018 12:00:00');
 
@@ -135,6 +133,26 @@ describe.only('Event E2E API', () => {
                         name: 'Dwayne Johnson'
                     }
                 }] }]);
+            });
+    });
+
+    it('cannot update an event if not the host', () => {
+        race.group = [squad._id];
+        race.attendance = [dwayne._id];
+        
+        return request.put(`/api/events/${race._id}`)
+            .set('Authorization', notTheRock.token)
+            .send(race)
+            .then(res => {
+                assert.equal(res.status, 403);
+                assert.equal(res.body.error, 'user is not the host');
+
+                return request.get(`/api/events/${race._id}`)
+                    .set('Authorization', notTheRock.token);
+            })
+            .then(({ body }) => {
+                assert.deepEqual(body.group, []);
+                assert.deepEqual(body.attendance, []);
             });
     });
     

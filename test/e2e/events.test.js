@@ -94,19 +94,18 @@ describe('Event E2E API', () => {
             .send(theRock2)
             .then(({ body }) => {
                 theRock2 = body;
-                token = body.token;
+                theRock2.token = body.token;
                 dwayne2.userId = body._id;
             });
     });
 
     before(() => {
-        return request.post('/api/auth/signup'
+        return request.post('/api/auth/signup')
             .send(notTheRock)
             .then(({ body }) => {
                 notTheRock = body;
                 notTheRock.token = body.token;
             });
-
     });
 
     before(() => {

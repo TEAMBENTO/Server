@@ -15,6 +15,12 @@ describe('Profile E2E Test', () => {
         name: 'Mr. Foo Bar'
     };
 
+    let user2 = {
+        email: 'not@user.com',
+        password: 'pleaseFail',
+        name: 'Wrong User'
+    };
+
     let profile1 = {
         userId: {},
         activities: 'basketball',
@@ -75,6 +81,16 @@ describe('Profile E2E Test', () => {
                 user1.token = body.token;
             });
     }); 
+
+    before(() => {
+        return request
+            .post('/api/auth/signup')
+            .send(user2)
+            .then(({ body }) => {
+                user2 = body;
+                user2.token = body.token;
+            });
+    });
     
     before(() => {
         return request.post('/api/groups')
@@ -197,6 +213,21 @@ describe('Profile E2E Test', () => {
             })
             .then(res => {
                 assert.equal(res.status, 404);
+            });
+
+    });
+
+    it('cannot delete another users profile', () => {
+        return request.delete(`/api/profiles/${profile1._id}`)
+            .set('Authorization', user2.token)
+            .then(res => {
+                assert.equal(res.status, 403);
+                assert.equal(res.body.error, 'not the same user');
+                return request.get(`/api/profiles/${profile1._id}`)
+                    .set('Authorization', user1.token);
+            })
+            .then(res => {
+                assert.equal(res.status, 200);
             });
 
     });

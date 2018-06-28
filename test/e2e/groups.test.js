@@ -149,8 +149,23 @@ describe('groups e2e', () => {
             });
     });
 
-    it('updates a group by id', () => {
+    it('cannon update a group they are not a captain of', () => {
         group1.members.push(profile2._id);
+        return request.put(`/api/groups/${group1._id}`)
+            .set('Authorization', user2.token)
+            .send(group1)
+            .then(res => {
+                assert.equal(res.status, 403);
+                assert.equal(res.body.error, 'user is not a captain');
+                return request.get(`/api/groups/${group1._id}`)
+                    .set('Authorization', user1.token);
+            })
+            .then(({ body }) => {
+                assert.equal(body.members.length, 1);
+            });
+    });
+
+    it('updates a group by id', () => {
         return request.put(`/api/groups/${group1._id}`)
             .set('Authorization', user1.token)
             .send(group1)
@@ -164,7 +179,24 @@ describe('groups e2e', () => {
             });
     });
 
+    it('updates an group by id only members', () => {
+        group1.members.push(profile2._id);
+        return request.put(`/api/groups/${group1._id}/mem`)
+            .set('Authorization', user1.token)
+            .send(group1)
+            .then(({ body }) => {
+                assert.deepEqual(body, group1);
+                return request.get(`/api/groups/${group1._id}`)
+                    .set('Authorization', user1.token);
+            })
+            .then(({ body }) => {
+                assert.equal(body.members.length, 3);
+            });
+    });
+
     it('cannot deletes an group if not a captain', () => {
+        group1.members.push(profile2._id);
+
         return request.delete(`/api/groups/${group1._id}`)
             .set('Authorization', user2.token)
             .then(res => {

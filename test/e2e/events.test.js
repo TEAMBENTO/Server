@@ -2,7 +2,7 @@ const { assert } = require('chai');
 const request = require('./request');
 const { dropCollection } = require('./db');
 
-describe.only('Event E2E API', () => {
+describe('Event E2E API', () => {
 
     before(() => dropCollection('events'));
     before(() => dropCollection('users'));
@@ -170,7 +170,6 @@ describe.only('Event E2E API', () => {
     });
 
     it('updates an event by id only attendence', () => {
-        console.log('@@@@@@@@@', dwayne2._id);
         race.attendance.push(dwayne2._id);
         
         return request.put(`/api/events/${race._id}/att`)

@@ -15,6 +15,12 @@ describe('Profile E2E Test', () => {
         name: 'Mr. Foo Bar'
     };
 
+    let user2 = {
+        email: 'food@bar.com',
+        password: 'foodbar',
+        name: 'Mr. Food Bar'
+    };
+
     let profile1 = {
         userId: {},
         activities: 'basketball',
@@ -73,6 +79,16 @@ describe('Profile E2E Test', () => {
             .then(({ body }) => {
                 user1 = body;
                 user1.token = body.token;
+            });
+    }); 
+
+    before(() => {
+        return request
+            .post('/api/auth/signup')
+            .send(user2)
+            .then(({ body }) => {
+                user2 = body;
+                user2.token = body.token;
             });
     }); 
     
@@ -198,6 +214,22 @@ describe('Profile E2E Test', () => {
             .then(res => {
                 assert.equal(res.status, 404);
             });
+    });
 
+    it.skip('tries to delete profile not same user', () => {
+        return request.delete(`/api/profiles/${profile1._id}`)
+            .set('Authorization', user2.token)
+            .then((res) => {
+                assert.equal(res.status, 403);
+                assert.ok(res.error);
+            });
+    });
+
+    it('gets profile1 by id', () => {
+        return request.get(`/api/profiles/${profile1._id}`)
+            .set('Authorization', user1.token)
+            .then(({ body }) => {
+                assert.equal(body, '');
+            }); 
     });
 });

@@ -15,6 +15,12 @@ describe('Profile E2E Test', () => {
         name: 'Mr. Foo Bar'
     };
 
+    let user2 = {
+        email: 'not@user.com',
+        password: 'pleaseFail',
+        name: 'Wrong User'
+    };
+
     let profile1 = {
         userId: {},
         activities: 'basketball',
@@ -75,13 +81,14 @@ describe('Profile E2E Test', () => {
                 user1.token = body.token;
             });
     }); 
-    
+
     before(() => {
-        return request.post('/api/groups')
-            .set('Authorization', user1.token)
-            .send(group1)
+        return request
+            .post('/api/auth/signup')
+            .send(user2)
             .then(({ body }) => {
-                group1 = body;
+                user2 = body;
+                user2.token = body.token;
             });
     });
 
@@ -98,6 +105,14 @@ describe('Profile E2E Test', () => {
                     _id, __v
                 });
                 profile1 = body;
+
+                group1.captains.push(profile1._id);
+                return request.post('/api/groups')
+                    .set('Authorization', user1.token)
+                    .send(group1)
+                    .then(({ body }) => {
+                        group1 = body;
+                    });
             });
     
     });
@@ -133,7 +148,6 @@ describe('Profile E2E Test', () => {
 
 
     it('gets profile1 by id', () => {
-        group1.captains.push(profile1._id);
         group1.members.push(profile1._id);
         return request.put(`/api/groups/${group1._id}`)
             .set('Authorization', user1.token)
@@ -188,6 +202,22 @@ describe('Profile E2E Test', () => {
             });
     });
 
+    it('tries to update a profile', () => {
+        profile1.activities = 'baseball';
+        return request.put(`/api/profiles/${profile1._id}`)
+            .set('Authorization', user2.token)
+            .send(profile1)
+            .then(({ body }) => {
+                assert.equal(body.error, 'not the same user');
+                return request.get(`/api/profiles/${profile1._id}`)
+                    .set('Authorization', user1.token);
+            })
+            .then(({ body }) => {
+                assert.equal(body.activities, 'yoga');
+            });
+        
+    });
+
     it('deletes a profile by id', () => {
         return request.delete(`/api/profiles/${profile2._id}`)
             .set('Authorization', user1.token)
@@ -197,6 +227,21 @@ describe('Profile E2E Test', () => {
             })
             .then(res => {
                 assert.equal(res.status, 404);
+            });
+
+    });
+
+    it('cannot delete another users profile', () => {
+        return request.delete(`/api/profiles/${profile1._id}`)
+            .set('Authorization', user2.token)
+            .then(res => {
+                assert.equal(res.status, 403);
+                assert.equal(res.body.error, 'not the same user');
+                return request.get(`/api/profiles/${profile1._id}`)
+                    .set('Authorization', user1.token);
+            })
+            .then(res => {
+                assert.equal(res.status, 200);
             });
 
     });

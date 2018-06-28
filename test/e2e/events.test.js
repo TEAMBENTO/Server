@@ -8,8 +8,6 @@ describe('Event E2E API', () => {
     before(() => dropCollection('users'));
     before(() => dropCollection('profiles'));
 
-    let token = '';
-
     const startTime = new Date('June 30, 2018 09:00:00');
     const endTime = new Date('June 30, 2018 12:00:00');
 
@@ -39,7 +37,29 @@ describe('Event E2E API', () => {
         name: 'Dwayne Johnson'
     };
 
+
+    let theRock2 = {
+        email: 'dwayne@therock2.com',
+        password: 'therock2',
+        name: 'Dwayne Johnson2'
+    };
+
+    let notTheRock = {
+        email: 'not@therock.com',
+        password: 'nottherock',
+        name: 'NOT Dwayne Johnson'
+    };
+
     let dwayne = {
+        userId: {},
+        activities: 'basketball',
+        bio: 'WWF and Acting',
+        demographic: 'Stuff about the rock.',
+        location: 'Los Angeles, CA',
+        image: 'image link'
+    };
+
+    let dwayne2 = {
         userId: {},
         activities: 'basketball',
         bio: 'WWF and Acting',
@@ -63,10 +83,29 @@ describe('Event E2E API', () => {
             .send(theRock)
             .then(({ body }) => {
                 theRock = body;
-                token = body.token;
+                theRock.token = body.token;
                 dwayne.userId = body._id;
             });
 
+    });
+
+    before(() => {
+        return request.post('/api/auth/signup')
+            .send(theRock2)
+            .then(({ body }) => {
+                theRock2 = body;
+                theRock2.token = body.token;
+                dwayne2.userId = body._id;
+            });
+    });
+
+    before(() => {
+        return request.post('/api/auth/signup')
+            .send(notTheRock)
+            .then(({ body }) => {
+                notTheRock = body;
+                notTheRock.token = body.token;
+            });
     });
 
     before(() => {
@@ -75,6 +114,15 @@ describe('Event E2E API', () => {
             .send(dwayne)
             .then(({ body }) => {
                 dwayne = body;
+            });
+    });
+
+    before(() => {
+        return request.post('/api/profiles')
+            .set('Authorization', theRock2.token)
+            .send(dwayne2)
+            .then(({ body }) => {
+                dwayne2 = body;
             });
     });
 
@@ -121,13 +169,42 @@ describe('Event E2E API', () => {
                 }] }]);
             });
     });
-    
-    it('updates an event by id', () => {
+
+    it('cannot update an event if not the host', () => {
         race.group = [squad._id];
         race.attendance = [dwayne._id];
         
         return request.put(`/api/events/${race._id}`)
+            .set('Authorization', notTheRock.token)
+            .send(race)
+            .then(res => {
+                assert.equal(res.status, 403);
+                assert.equal(res.body.error, 'user is not the host');
+
+                return request.get(`/api/events/${race._id}`)
+                    .set('Authorization', notTheRock.token);
+            })
+            .then(({ body }) => {
+                assert.deepEqual(body.group, []);
+                assert.deepEqual(body.attendance, []);
+            });
+    });
+    
+    it('updates an event by id', () => {
+        race.group = [squad._id];
+        race.attendance = [dwayne._id];
+        return request.put(`/api/events/${race._id}`)
             .set('Authorization', theRock.token)
+            .send(race)
+            .then(({ body }) => {
+                assert.deepEqual(body, race);
+            });
+    });
+
+    it('updates an event by id only attendence', () => {
+        race.attendance.push(dwayne2._id);
+        return request.put(`/api/events/${race._id}/att`)
+            .set('Authorization', theRock2.token)
             .send(race)
             .then(({ body }) => {
                 assert.deepEqual(body, race);
@@ -144,7 +221,37 @@ describe('Event E2E API', () => {
                         _id: theRock._id,
                         name: 'Dwayne Johnson'
                     }
+                }], attendance: [{
+                    _id: dwayne._id,
+                    image: 'image link',
+                    userId: {
+                        _id: theRock._id,
+                        name: 'Dwayne Johnson'
+                    }
+                },
+                {
+                    _id: dwayne2._id,
+                    image: 'image link',
+                    userId: {
+                        _id: theRock2._id,
+                        name: 'Dwayne Johnson2'
+                    }
                 }] });
+            });
+    });
+
+    it('cannot deletes an event if not the host', () => {
+        return request.delete(`/api/events/${race._id}`)
+            .set('Authorization', notTheRock.token)
+            .then(res => {
+                assert.equal(res.status, 403);
+                assert.equal(res.body.error, 'user is not the host');
+
+                return request.get(`/api/events/${race._id}`)
+                    .set('Authorization', notTheRock.token);
+            })
+            .then(res => {
+                assert.equal(res.status, 200);
             });
     });
 

@@ -2,7 +2,7 @@ const { assert } = require('chai');
 const request = require('./request');
 const { dropCollection } = require('./db');
 
-describe('Event E2E API', () => {
+describe.only('Event E2E API', () => {
 
     before(() => dropCollection('events'));
     before(() => dropCollection('users'));
@@ -39,7 +39,22 @@ describe('Event E2E API', () => {
         name: 'Dwayne Johnson'
     };
 
+    let theRock2 = {
+        email: 'dwayne@therock2.com',
+        password: 'therock2',
+        name: 'Dwayne Johnson2'
+    };
+
     let dwayne = {
+        userId: {},
+        activities: 'basketball',
+        bio: 'WWF and Acting',
+        demographic: 'Stuff about the rock.',
+        location: 'Los Angeles, CA',
+        image: 'image link'
+    };
+
+    let dwayne2 = {
         userId: {},
         activities: 'basketball',
         bio: 'WWF and Acting',
@@ -70,11 +85,31 @@ describe('Event E2E API', () => {
     });
 
     before(() => {
+        return request.post('/api/auth/signup')
+            .send(theRock2)
+            .then(({ body }) => {
+                theRock2 = body;
+                token = body.token;
+                dwayne2.userId = body._id;
+            });
+
+    });
+
+    before(() => {
         return request.post('/api/profiles')
             .set('Authorization', theRock.token)
             .send(dwayne)
             .then(({ body }) => {
                 dwayne = body;
+            });
+    });
+
+    before(() => {
+        return request.post('/api/profiles')
+            .set('Authorization', theRock2.token)
+            .send(dwayne2)
+            .then(({ body }) => {
+                dwayne2 = body;
             });
     });
 
@@ -128,6 +163,18 @@ describe('Event E2E API', () => {
         
         return request.put(`/api/events/${race._id}`)
             .set('Authorization', theRock.token)
+            .send(race)
+            .then(({ body }) => {
+                assert.deepEqual(body, race);
+            });
+    });
+
+    it('updates an event by id only attendence', () => {
+        console.log('@@@@@@@@@', dwayne2._id);
+        race.attendance.push(dwayne2._id);
+        
+        return request.put(`/api/events/${race._id}/att`)
+            .set('Authorization', theRock2.token)
             .send(race)
             .then(({ body }) => {
                 assert.deepEqual(body, race);

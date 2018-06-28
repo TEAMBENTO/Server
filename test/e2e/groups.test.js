@@ -2,7 +2,7 @@ const { assert } = require('chai');
 const request = require('./request');
 const { dropCollection } = require('./db');
 
-describe('groups e2e', () => {
+describe.only('groups e2e', () => {
 
     before(() => dropCollection('users'));
     before(() => dropCollection('profiles'));
@@ -149,8 +149,23 @@ describe('groups e2e', () => {
             });
     });
 
-    it('updates a group by id', () => {
+    it('cannon update a group they are not a captain of', () => {
         group1.members.push(profile2._id);
+        return request.put(`/api/groups/${group1._id}`)
+            .set('Authorization', user2.token)
+            .send(group1)
+            .then(res => {
+                assert.equal(res.status, 403);
+                assert.equal(res.body.error, 'user is not a captain');
+                return request.get(`/api/groups/${group1._id}`)
+                    .set('Authorization', user1.token);
+            })
+            .then(({ body }) => {
+                assert.equal(body.members.length, 1);
+            });
+    });
+
+    it('updates a group by id', () => {
         return request.put(`/api/groups/${group1._id}`)
             .set('Authorization', user1.token)
             .send(group1)

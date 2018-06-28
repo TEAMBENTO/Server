@@ -193,7 +193,6 @@ describe('Event E2E API', () => {
     it('updates an event by id', () => {
         race.group = [squad._id];
         race.attendance = [dwayne._id];
-        
         return request.put(`/api/events/${race._id}`)
             .set('Authorization', theRock.token)
             .send(race)
@@ -204,7 +203,6 @@ describe('Event E2E API', () => {
 
     it('updates an event by id only attendence', () => {
         race.attendance.push(dwayne2._id);
-        
         return request.put(`/api/events/${race._id}/att`)
             .set('Authorization', theRock2.token)
             .send(race)

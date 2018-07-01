@@ -22,7 +22,7 @@ describe('users e2e tests', () => {
         image: 'image link'
     };
 
-    let token = null;
+    let token = null; // eslint-disable-line
 
     before(() => {
         return request.post('/api/auth/signup')

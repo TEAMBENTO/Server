@@ -20,7 +20,7 @@ then
 
     npm start
 
-View the accompanying back-end server repo [here](https://github.com/TEAMBENTO/Server)
+View the accompanying back-end server repo [here](https://github.com/TEAMBENTO/App)
 
 Or visit the live site [here](http://rally-alchemy.herokuapp.com/)
 

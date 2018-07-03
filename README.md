@@ -1,5 +1,7 @@
 # RALLY V.1.0.0
 
+// initial grading/feedback commit
+
 A social media platform connecting active people based on their interest in sports and the outdoors
 
 ### Description
